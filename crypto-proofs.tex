@@ -1,20 +1,79 @@
 \documentclass[A4, 11pt]{article}
-
-\package{mathptmx}
+\usepackage{mathptmx}
 
 \input{/Users/ananthr/tex-macros/macros.tex}
 
 \begin{document}
-% --- header stuff ---
-\newlength{\boxwidth}
-\setlength{\boxwidth}{\textwidth}
-\addtolength{\boxwidth}{-2cm}
-\framebox[\textwidth]{
-\begin{minipage}[t]{\boxwidth}
-{\bf CS255: Introduction to Cryptography \hfill Winter 2011}  \\[-0.3cm]
-\begin{center} {\Large Proofs in Cryptography: Handout (Draft)} \end{center}
-\end{minipage}}
-\vspace{0.7cm}
-% --- end of header stuff ---
 
+\title{Proofs in Cryptography\footnote{{\bf Rough Draft} of a handout for
+CS255: Introduction to Cryptography by Dan Boneh.}}
+\author{Ananth Raghunathan\thanks{{\tt ananthr@stanford.edu}}}
+\date{}
+\maketitle
+
+\begin{abstract}
+We give a brief overview of proofs in cryptography at a beginners level. We
+briefly cover a general way to look at proofs in cryptography and briefly
+compare the requirements to traditional reductions in computer science. We
+then look at two security paradigms, indistinguishability and simulation
+based security. We also describe the security models for Secret Key and
+Public Key systems with appropriate motivations. Finally, we cover some
+advanced topics and conclude with a few exercises and hints.
+\end{abstract}
+
+\section{Introduction}
+
+\subsection{General Outline}
+
+\subsection{Relation to reductions in Complexity Theory}
+
+\subsection{Two security paradigms*}
+
+\subsubsection{IND*}
+
+\subsubsection{SIM*}
+
+\pagebreak
+\section{Secret Key Cryptography}
+
+\subsection{Information Theoretic Arguments}
+
+\subsection{Semantic Security}
+
+\subsection{PRGs}
+
+\subsection{PRFs}
+
+\subsection{Block Ciphers or Pseudorandom Functions}
+
+\subsection{Message Authentication Codes}
+
+\subsection{Collision-resistant Hash functions}
+
+\section{Public Key Cryptography}
+
+\subsection{Semantic Security against CPA}
+
+\subsection{CCA}
+
+\subsection{OWFs}
+
+\subsection{Signature schemes}
+
+\section{Advanced Topics*}
+
+\subsection{Hybrid Arguments*}
+
+\subsection{Randomized Self Reductions*}
+
+\section{Exercises}
+
+\begin{enumerate}
+\item Prove that truncating the output of a PRF is still secure
+\item Prove that any subset of the bits of a PRG are still indistinguishable
+\item Prove that a $\ell$-expanding PRG is a small domain PRF
+\item Introduce hardness of SVP in perp lattices and prove that
+$f_A(x)=A\cdot x \imod{q}$ is a collision resistant hash function
+\item Prove that a PRF implies a One Way Function
+\end{enumerate}
 \end{document}
