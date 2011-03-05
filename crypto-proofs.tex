@@ -3,6 +3,8 @@
 
 \input{/Users/ananthr/tex-macros/macros.tex}
 
+\newcommand{\todo}[1]{\small{\sc #1}\normalsize \\}
+
 \begin{document}
 
 \title{Proofs in Cryptography\footnote{{\bf Rough Draft} of a handout for
@@ -22,18 +24,70 @@ advanced topics and conclude with a few exercises and hints.
 \end{abstract}
 
 \section{Introduction}
+\todo{Talk about the need for working with reductions and different security
+definitions. The subtleties that arise in definitions, the time it took to
+come up with good definitions of security.}
+
+Before we go about describing a general outline to prove the security of
+constructions, let us have an informal discussion. Proving the
+impossibility of a particular computational task is extremely difficult. It
+is very close to the P vs.~NP question (add reference) that is the central
+question in computer science today. It becomes doubly difficult when do not
+know what class of computational tasks we are allowed to utilize (unlike
+the case of P vs.~NP, where a Turing machine has been rigorously and
+beautifully formalized). Therein lies the central difficulty in proving the
+security of cryptographic constructions. 
+
+One way to address the latter question is to explicitly model what an
+adversary who intends to break our cryptosystem is allowed to do. Notice
+this requires us to define at least two things: what do we mean by an
+``adversary'' and what it means to ``break'' the cryptosystem. A lot of
+emperical and theoretical work goes into the current models of
+``adversary'' and ``break'' and currently the definitions we use have been
+used widely in practice and give us good results emperically. 
+
+However, as it happens often in this field, the adversary in the real world
+is not constrained to behave as we dictate him\footnote{or her. I will
+restrict myself to male pronouns for simplicity.}. There have been several
+real world attacks (side-channel attacks, cold-boot attacks are recent
+innovative attack (add references)) that completely side-step the
+adversarial model and as expected completely breaks the security of the
+scheme. However, this only serves as motivation to model stronger
+adversaries and thereby construct more robust cryptosystems that are
+provably robust (with respect to the new models).
+
+\par
+In conclusion, remember two important things: To analyse a cryptosystem you
+must define an adversary model and a security game. 
+
+\begin{enumerate}
+\item {\bf Adversary model:} This defines formally the power of the
+adversary. It includes specifics whether the adversary is
+deterministic/randomized, uniform/non-uniform, interactive/non-interactive
+and how he interacts with the security game. 
+
+\item {\bf Security game:} This defines formally the power the adversary
+has over the cryptosystem. Whether he has access to a single ciphertext,
+multiple ciphertexts, multiple keys, etc. It also defines when an adversary
+is said to break the system. 
+\end{enumerate}
+Often adversaries are modeled similarly, but depending on whether you want
+weak or strong security guarantees, you modify the security game
+accordingly.
+
+Two broad paradigms for security games are indistinguishablity games and
+simulation games. Subsection \ref{subsec:indsim} will talk about it in more
+detail. 
 
 \subsection{General Outline}
-
 \subsection{Relation to reductions in Complexity Theory}
 
-\subsection{Two security paradigms*}
+\subsection{Two security paradigms*} \label{subsec:indsim}
 
 \subsubsection{IND*}
 
 \subsubsection{SIM*}
 
-\pagebreak
 \section{Secret Key Cryptography}
 
 \subsection{Information Theoretic Arguments}
