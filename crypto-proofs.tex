@@ -2,8 +2,8 @@
 \usepackage{mathptmx}
 
 \input{/Users/ananthr/tex-macros/macros.tex}
-
-\newcommand{\todo}[1]{\small{\sc #1}\normalsize \\}
+\newcommand{\todo}[1]{\small{\sc #1}\normalsize}
+\renewcommand{\L}{\ensuremath{\mathcal{L}}}
 
 \begin{document}
 
@@ -27,11 +27,12 @@ advanced topics and conclude with a few exercises and hints.
 \todo{Talk about the need for working with reductions and different security
 definitions. The subtleties that arise in definitions, the time it took to
 come up with good definitions of security.}
+\\
 
 Before we go about describing a general outline to prove the security of
 constructions, let us have an informal discussion. Proving the
 impossibility of a particular computational task is extremely difficult. It
-is very close to the P vs.~NP question (add reference) that is the central
+is very close to the P vs.~NP question (\todo{add reference}) that is the central
 question in computer science today. It becomes doubly difficult when do not
 know what class of computational tasks we are allowed to utilize (unlike
 the case of P vs.~NP, where a Turing machine has been rigorously and
@@ -50,7 +51,7 @@ However, as it happens often in this field, the adversary in the real world
 is not constrained to behave as we dictate him\footnote{or her. I will
 restrict myself to male pronouns for simplicity.}. There have been several
 real world attacks (side-channel attacks, cold-boot attacks are recent
-innovative attack (add references)) that completely side-step the
+innovative attack (\todo{add references})) that completely side-step the
 adversarial model and as expected completely breaks the security of the
 scheme. However, this only serves as motivation to model stronger
 adversaries and thereby construct more robust cryptosystems that are
@@ -80,12 +81,123 @@ simulation games. Subsection \ref{subsec:indsim} will talk about it in more
 detail. 
 
 \subsection{General Outline}
+In this section, I will give a general outline for simple proofs of
+security in cryptosystems. This broadly follows the outline in
+Katz-Lindell. 
+
 \subsection{Relation to reductions in Complexity Theory}
+Readers not intimately familiar with the complexity classes P and NP and
+notions of NP-hardness, NP-completeness and witnesses and membership in
+languages should skip this section. It is not required to understand proofs
+in crytography but provides an interesting comparison. 
+
+\par
+At this juncture, it is interesting to compare proofs in cryptography to
+proofs in complexity theory. In particular, for an undergraduate audience,
+the most familiar reductions proofs involve proving the NP-completeness of
+problems. Let us recall how a proof that a language $\L$ is NP-complete.
+Proving that $\L \in NP$ is {\bf not a reduction}. It requires us to
+present an algorithm that verifies that $w$ a string is a witness to the
+fact that $x \in \L$. This must be done efficiently (i.e., in time
+polynomial in $|x|$, the input length) with a witness string $w$ that is
+not too much longer than $|x|$. We require a reduction proof to show that
+$\L$ is NP-hard.
+
+To prove $\L$ is NP-hard we are required to show that deciding membership
+in $\L$ is {\bf as hard as} deciding membership of {\bf any} NP language.
+Because there exist NP-complete languages, like 3SAT it suffices to show
+that 3SAT is {\bf no harder} than deciding membership in $\L$. In other
+words, given an efficient algorithm that decides membership in $\L$, we
+need to construct an efficient algorithm that decides whether a boolean
+formula $\phi$ is satisfiable or not. 
+
+\par
+Now we can take a step back and look at the parallels. Clearly, this is a
+proof of the contrapositive of the statement that we are really after:
+deciding membership in $\L$ is as hard as 3SAT. Secondly, we assume the
+existence of an efficient algorithm that already decides $\L$ and use it to
+construct an efficient algorithm that solves 3SAT. Thus, superficially, it
+looks similar to proofs in cryptography. But there are a few subtle
+differences that I hope will further strengthen your understanding of
+proofs in cryptography:
+
+\begin{enumerate}
+\item Notice that we assume an algorithm for $\L$ that solves {\bf all}
+instances of $x \in \L$. Adversaries in cryptography are generally
+probabilistic and are required to work only for a non-negligible fraction
+of the inputs. In particular, an adversary that steals ``some'' credit card
+numbers is sufficient; we are not particularly impressed with a proof that
+there is no adversary who steals ``all'' credit card numbers possibly used
+in the system because that adversary is unreasonably strong. 
+
+This implies that in complexity theory proofs, it suffices to take a 3SAT
+instance $\phi$ and convert it to {\bf some} instance $x$ for $\L$. But in
+cryptography, we require that this instance $x$ look identical to an
+adversary in the security game. In other words, it must appear as though it
+came from a real distribution over possible instances (for eg., refer to
+the solution of HW2 problem 4 where most people tripped up over this fact). 
+
+\par
+This leads to a more general and very deep and interesting topic in the
+intersection of complexity and cryptography---the notion of {\bf
+average-case complexity} vs.~{\bf worst-case complexity}. Cryptography
+problems are required to be proven hard {\bf on the average}\footnote{This
+is highly informal and only described thus to provide intuition. More
+formally, you define easily samplable distributions corresponding to the
+real instantiation and average here refers to instances drawn from this
+distribution. It isn't required to be uniform, although that is most
+intuitive.}. Proving that some instances are hard (i.e., there are no
+adversaries who break {\bf all} the crypto instances) does not inspire
+confidence\footnote{Imagine if your bank only guaranteed that there are
+definitely some customers whose credit card information is secure!}.
+Therefore remember, you are required to show that {\bf average} instances
+of certain problems are hard. Therefore, you must not assume an adversary
+works on arbitrary values, rather that he works only if the values given to
+him look identical (or indistinguishable) from values that might arise in a
+security game (that he purportedly breaks).
+
+\item The second, and slightly less important distinction is that proofs
+involving NP-completeness do not require you to conver the solution of the
+membership of $x \in \L$ back to whether $\phi \in {\rm 3SAT}$ or not.
+Because it is a binary result (``yes'' or ``no'') the same is true for the
+satisfiability of $\phi$. But in cryptography, sometimes the proof is
+incomplete unless you use the values given by the adversary to break the
+original problem you assumed were hard. And note that both {\bf
+constructing inputs} to the adversaries (i.e., simulating him) and {\bf
+recovering hard-to-compute values} to break your assumption must be
+efficient algorithms. 
+
+\item Finally, proofs of NP-completeness are almost always deterministic.
+Therefore algorithms work with probability 1.  However, in cryptography,
+you have the notion of the advantage of an adversary, the probability that
+he succeeds over a na\"ive algorithm. You are required to take an adversary
+that works with non-negligible advantage and use it to construct an
+adversary to break the assumption with non-negligble advantage. 
+
+In cryptography, as in complexity, a lot of research goes into constructing
+reductions that are ``tight'', i.e., they are efficient and succeed with
+the {\bf same, or close to same advantage} as the purported adversaries.
+These are important in practice becaues they help keep security parameters
+small. Otherwise, slack in reductions will require us to ramp up the
+parameters to make the adversary's advantage non-negligible. To take a toy
+example, if a system has an adversary with advantage $\eps$, we can
+construct an algorithm that inverts RSA with probability $\eps^2$. Clearly
+this is a weak reduction. Since we require $\eps<2^{-80}$, we must choose
+parameters such that RSA adversaries have advantage $2^{-160}$. This
+requires us to make the parameters 8 times as big as what we would have
+with a tight reduction\footnote{Remember, the best algorithm today is
+roughly exponential in the {\bf cube-root} of the security parameter}!
+
+\end{enumerate}
 
 \subsection{Two security paradigms*} \label{subsec:indsim}
+\todo{Talk about the two security paradigms, Manoj Prabhakaran's slides
+will be useful.}
+\\
+
+\todo{For next year. Not required for CS255.}
 
 \subsubsection{IND*}
-
 \subsubsection{SIM*}
 
 \section{Secret Key Cryptography}
