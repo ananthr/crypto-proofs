@@ -2,8 +2,10 @@
 \usepackage{mathptmx}
 
 \input{/Users/ananthr/tex-macros/macros.tex}
+\usepackage{fullpage}
 \newcommand{\todo}[1]{\small{\sc #1}\normalsize}
 \renewcommand{\L}{\ensuremath{\mathcal{L}}}
+\newcommand{\Chal}{\ensuremath{\mathsf{Chal}}}
 
 \begin{document}
 
@@ -201,10 +203,55 @@ will be useful.}
 \subsubsection{SIM*}
 
 \section{Secret Key Cryptography}
+In this section, I will discuss some of the security models for various
+symmetric (or secret) key constructions. I will briefly provide motivation
+for the definitions and a paragraph or two on how to provide proofs. Formal
+definitions can be found in standard text-books. 
 
 \subsection{Information Theoretic Arguments}
+It wasn't until the early 50's, after Shannon's paper that people began to
+formulate and think of what it meant to be secure. Shannon gave an elegant
+definition that did not involve any notion of computation (partly because
+the Turing machine itself was only a decade old). Instead he looked at
+probability distirbutions and information theory.
+
+The first definition of security, {\bf perfect secrecy} states that a
+ciphertext leaks no information about the plaintext (to {\bf any}, even an
+all-powerful adversary). This is equivalent to stating that the probability
+that a given message maps to a given ciphertext is exactly identical for
+every pair of messages and ciphertexts (for randomly chosen keys). 
+
+Therefore, given a ciphertext, one learns nothing about which message it
+encrypts. This is a neat definition which does not require us to talk about
+adversaries and provide reductions, only work with probabilities. But as
+mentioned in class, perfectly secure systems require the keys to be at
+least as long as the message. Therefore they are thoroughly impractical.
+This requires us to relax the definition of security.
+
+\par
+To prove that a scheme is perfectly secure, you must be able to show that
+for any pair of messages, the probability that they map to a given
+ciphertext is identical. This would usually be a straightforward
+probability argument. One example of a perfectly secure system is a
+one-time pad.  
 
 \subsection{Semantic Security}
+Now that we know perfect security in some sense is overkill, we look to
+relaxations. In their landmark paper in (\todo{cite paper, year})
+Goldwasser and Micali came up with a brilliant concept called semantic
+security. They argued that, in the spirit of Shannon's argument, we require
+that a ciphertext must reveal nothing about the message. If the probability
+distributions of messages, given ciphertexts are identical this is
+trivially true. But it would also be true if no efficient adversary can
+discern a difference because in the real world we are only worried about
+adversaries that are efficient. 
+
+The formal definition of semantic security precisely states this. Given
+{\bf any} two pair of messages $m_0$ and $m_1$, if the ciphertexts of $m_0$
+and $m_1$ cannot be distinguished by efficient adversaries, the scheme is
+said to be semantically secure. 
+
+\subsection{Semantic Security against CPA}
 
 \subsection{PRGs}
 
@@ -218,7 +265,6 @@ will be useful.}
 
 \section{Public Key Cryptography}
 
-\subsection{Semantic Security against CPA}
 
 \subsection{CCA}
 
@@ -235,11 +281,105 @@ will be useful.}
 \section{Exercises}
 
 \begin{enumerate}
-\item Prove that truncating the output of a PRF is still secure
-\item Prove that any subset of the bits of a PRG are still indistinguishable
-\item Prove that a $\ell$-expanding PRG is a small domain PRF
-\item Introduce hardness of SVP in perp lattices and prove that
-$f_A(x)=A\cdot x \imod{q}$ is a collision resistant hash function
-\item Prove that a PRF implies a One Way Function
+
+\item \label{ex:flip} {\it Prove that flipping bits of a PRG is still
+secure.} Given a PRG $G$ that is secure (i.e., satisfies the
+indistinguishability game) construct a PRG $G'(x) \deq \overline{b_1}
+\overline{b_2} \cdots \overline{b_n}$ where $(b_1b_2\cdots b_n) = G(x)$,
+the output of $G$ on $x$ and $\overline{b}$ is the bit $b$ flipped. Show
+that $G'$ is still secure. To do this, construct an adversary $\B$ that
+given a string decides whether it is from $G$ (i.e., $G$ evaluated on a
+random input) or completely random with probability better than $1/2$. To
+do this, it uses $\A$ who claims to break the distinguishability test for
+$G'$. Therefore, $\B$ must somehow use its challenge string $w$ and concoct
+a string for $\A$ to help it decide whether it is random or not. 
+
+\item {\it Prove that permuting the bits of a PRG is still secure.} Given a
+PRG $G$, and a permutation $\pi$ (and its inverse permutation
+$\pi^{-1}$)\footnote{I.e., $\pi^{-1}(\pi(i))=i$ for all $i$.},
+consider $G_\pi(x) = (b_{\pi(1)}b_{\pi(2)}\cdots b_{\pi(n)})$ where
+$(b_1b_2\cdots b_n) = G(x)$. Show, largely along the lines of Exercise
+\ref{ex:flip} that $G_\pi$ is secure. In particular if $\pi$ is the
+identity this is trivial. If $\pi(i)=n+1-i$, i.e., $G'$ simply reverses the
+bits of the output, the proof is covered in the section. You need to use
+$\pi^{-1}$.  
+
+\item \label{ex:lexp}{\it Prove that a $\ell$-expanding PRG is a small
+domain PRF.} This is HW1 problem 7b. The formal statement can be found on
+the website. Here, to prove the security, given an adversary $\A$ for the
+small domain PRF, you are required to construct an adversary $\B$ that
+interacts with the PRG-Challenger and distinguishes whether the string
+given were random or pseudorandom. Remember, $\B$ must present a
+PRF-Challenger $\Chal$ to $\A$ and ensure that he is {\bf faithfully}
+simulating either a random function or a pseudorandom function. 
+
+\item \label{ex:prftrunc}{\it Prove that truncating the output of a PRF is
+still secure.} More formally, given a PRF $F:K \times X \rightarrow \zo^m$,
+construct $F'(k,x)=F(k,x)|_\ell$, where $\ell < m$ is the output length of
+$F':K \times X \rightarrow \zo^\ell$ is also secure. The way the proof
+would go would be to take an efficient adversary $\A$ that breaks the PRF
+indistinguishability game for $F'$ and construct $\B$ that has a challenger
+$\Chal$ as in the security definition for $F$ and must guess whether
+$\Chal$ is giving him his queries evaluated on $F$ or a random function.
+Note here $\B$ {\bf must present} a challenger for $\A$. See Exercise
+\ref{ex:lexp} above for more ideas. 
+
+\item {\it Prove that any subset of the bits of a PRG are still
+indistinguishable.} This proof is largely along the lines of Exercise
+\ref{ex:prftrunc} above. This is much simpler because you aren't required
+to simulate queries (the challenger for a PRG simply presents one of two
+strings, and asks for a distinguisher).
+
+\item {\it Introduce hardness of SVP in perp lattices and prove that
+$f_A(x)=A\cdot x \imod{q}$ is a collision resistant hash function.} There
+is this hard problem that has recently received a lot of interest in the
+crypto community that we will refer to as SVP in random lattices. The
+formal statement is as follows: Consider a random matrix $A \in \Z_q^{n
+\times m}$. Finding a ``short'' $e \in \Z^m$ such that $A \cdot e = 0
+\imod{q}$ is hard. Here short implies that $\|e\|_2 \leq \beta$ for some
+parameter $\beta$. Therefore, an adversary $\B$ that breaks this system
+will, given a random matrix output $e$ that satisfies the above conditions. 
+
+Now, we can construct a simple collision-resistant hash function from this
+system. Consider $H:\zo^m \rightarrow [q]^n$\footnote{Recollect that
+$[q]=\{1,\ldots,q-1,q\}$.}, that takes $m$-bit strings and outputs $n$
+elements in $[q]$. For a random $A$, define $H_A(x) = A\cdot x \imod{q}$.
+Check for yourself that the input and outputs of the hash function are
+correct. Show that finding collisions in $H_A(\cdot)$ are as hard as SVP in
+a random lattice.
+
+A proof would require you to construct an adversary $\B$ that takes an
+adversary $\A$ that outputs collisions from $H_A(\cdot)$ and use this to
+break SVP. 
+
+\item {\it Prove that PRGs imply One Way Functions.} Recollect in class, we
+mentioned several ways to construct one-way functions. The simplest way,
+and the one with least structure to exploit was this generic construction
+from pseudorandom functions. First, we will show that a PRG implies a
+one-way function. Let $G:\zo^s \rightarrow \zo^n$, $n>s$ be a PRG that
+takes a $s$-bit input and outputs $n$ pseudorandom bits. Show that
+$F(x)\deq G(x)$ is a one-way function. An adversary for a OWF takes the
+image of a random element and outputs a preimage that evaluates to the same
+value. Therefore, given $G(r)$ for random $r$, the adversary outputs $r'$
+(that might be equal to $r$) such that $G(r)=G(r')$. Therefore show that
+you can construct an adversary $\B$ that distinguishes a PRG output from
+random given $\A$ that inverts the one-way function with non-negligble
+probability.
+
+\item {\it Prove that a PRFs imply OWFs.} Now we show that we can construct
+PRFs from OWFs. Recall that given sufficiently expanding PRGs we can
+construct PRFs therefore for sufficiently expanding PRGs, this proves the
+previous exercise as well. Consider ${\rm OWF}(x) \deq F(x,0) \| F(x,1)$
+for simplicity.  Show that an adversary $\A$ that inverts the OWF can be
+used to construct an adversary $\B$ that interacts with a PRF challenger
+$\Chal$ and decides whether it is dealing with a random function or a
+pseudo-random function.  This means that $\B$ must behave sufficiently
+differently for the two possible games the challenger plays with him (see
+the definition of PRFs).
+
+Now, can you see how this proof extends to ${\rm OWF}(x) \deq F(x,\alpha_1)
+\| F(x, \alpha_2) \ldots \| F(x,\alpha_q)$ for any {\bf fixed constants}
+$\alpha_1, \ldots, \alpha_q$ where $q$ is at most a polynomial in $|x|$ ?
+
 \end{enumerate}
 \end{document}
